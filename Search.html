@@ -1,0 +1,549 @@
+<html>
+     <head>
+         <title>Social Network Analyzer: Data Retrieval Module</title>
+                <!-- SECTION 1 : Initial configuration -->
+                    <link REL="stylesheet" TYPE="text/css" href="http://searchapi.scopus.com/stylesheets/css_sciverse_list_hilight.css"/>
+                        <!-- <script type="text/javascript" src="http://api.elsevier.com/javascript/scopussearch.jsp"></script> -->
+						<script type="text/javascript" src="http://api.elsevier.com/javascript/scopussearch.jsp"></script> 
+						<script src="//cdnjs.cloudflare.com/ajax/libs/json2/20110223/json2.js"></script>
+						<script src="https://raw.github.com/andris9/jStorage/master/jstorage.js"></script>
+						<!--<script type="text/javascript" src="http://api.elsevier.com/javascript/citedby_image.jsp"></script> -->
+						
+						
+                        <script type="text/javascript">
+                            <!-- SECTION 2 : Call back -->
+                            	function article(abstract, affiliation, authList, citedByCount, docType, DOI, EID, firstAuth, inwardURL, ISSN, issue, page, pubDate, SCP, sourceTitle, title, volume){
+					this.abstract = abstract;
+					this.affiliation = affiliation;
+					this.authList = authList;
+					this.citedByCount = citedByCount;
+					this.docType = docType;
+					this.DOI = DOI;
+					this.EID = EID;
+					this.firstAuth = firstAuth;
+					this.inwardURL = inwardURL;
+					this.ISSN = ISSN;
+					this.issue = issue;
+					this.page = page;
+					this.pubDate = pubDate;
+					this.SCP = SCP;
+					this.sourceTitle = sourceTitle;
+					this.title = title;
+					this.volume = volume;
+				}	
+                            
+                               callback = function(){ 
+		                		document.sciverseForm.searchButton.disabled = false; 
+		                       
+		                       		var theSearch = sciverse.getSearchResults();
+				               
+				               var articles = new Array();
+				               
+				               for(var i=0; i < theSearch.returnedResults; i++){
+				               		var abstract = theSearch.results[i].abs;
+							var affiliation = theSearch.results[i].affiliation;
+							var authList = theSearch.results[i].authlist;
+							var citedByCount = theSearch.results[i].citedbycount;
+							var docType = theSearch.results[i].doctype;
+							var DOI = theSearch.results[i].doi;
+							var EID = theSearch.results[i].eid;
+							var firstAuth = theSearch.results[i].firstauth;
+							var inwardURL = theSearch.results[i].inwardurl;
+							var ISSN = theSearch.results[i].issn;
+							var issue = theSearch.results[i].issue;
+							var page = theSearch.results[i].page;
+							var pubDate = theSearch.results[i].pubdate;
+							var SCP = theSearch.results[i].scp;
+							var sourceTitle = theSearch.results[i].sourcetitle;
+							var title = theSearch.results[i].title;
+							var volume = theSearch.results[i].vol;
+							
+							articles[i] = new article(abstract, affiliation, authList, citedByCount, docType, DOI, EID, firstAuth, inwardURL, ISSN, issue, page, pubDate, SCP, sourceTitle, title, volume);
+				               }
+				               
+				               var objx = localStorage.getItem("results");
+						
+						if(objx != null )
+						{
+							var obj = JSON.parse(objx);
+					
+						       	var result = obj.concat(articles);
+						       	
+						       	localStorage.setItem("results", JSON.stringify(result));
+				               	}
+				               	else{
+				               		localStorage.setItem("results", JSON.stringify(articles));
+				               	}
+                               }
+                            <!-- SECTION 3 : Running Search -->
+                               function runSearch(year, month)
+                               {
+                               document.sciverseForm.searchButton.disabled = true;
+                               var varSearchObj = new searchObj();
+			       var str = "PUBDATETXT(" + month + year + ") ";
+				    
+				       if(document.Form.searchString.value != ""){
+				       str += document.Form.searchString.value;
+				       }
+				       
+				       if(document.FORM1.ABS.value != ""){
+				       		if(str != "") {str += " AND ";}
+				       str += "ABS(" + document.FORM1.ABS.value + ")";
+				       }
+				       
+				       if(document.FORM1.AFID.value != ""){
+				       		if(str != "") {str += " AND ";}
+				       str += "AF-ID(" + document.FORM1.AFID.value + ")";
+				       }
+				       
+				       if(document.FORM1.AFFIL.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "AFFIL(" + document.FORM1.AFFIL.value + ")";
+				       }
+				       
+				       if(document.FORM1.AFFILCITY.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "AFFILCITY(" + document.FORM1.AFFILCITY.value + ")";
+				       }
+				       
+				       if(document.FORM1.AFFILCITY.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "AFFILCOUNTRY(" + document.FORM1.AFFILCOUNTRY.value + ")";
+				       }
+				       
+				       if(document.FORM1.AFFILORG.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "AFFILORG(" + document.FORM1.AFFILORG.value + ")";
+				       }
+				       
+				       if(document.FORM2.ARTNUM.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "ARTNUM(" + document.FORM2.ARTNUM.value + ")";
+				       }
+				       
+				       if(document.FORM2.AUID.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "AU-ID(" + document.FORM2.AUID.value + ")";
+				       }
+				       
+				       if(document.FORM2.AUTHORNAME.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "AUTHOR-NAME(" + document.FORM2.AUTHORNAME.value + ")";
+				       }
+				       
+				       if(document.FORM2.AUTH.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "AUTH(" + document.FORM2.AUTH.value + ")";
+				       }
+				       
+				       if(document.FORM2.AUTHFIRST.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "AUTHFIRST(" + document.FORM2.AUTHFIRST.value + ")";
+				       }
+				       
+				       if(document.FORM2.AUTHLASTNAME.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "AUTHLASTNAME(" + document.FORM2.AUTHLASTNAME.value + ")";
+				       }
+	if(document.FORM10.TRADENAME.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "TRADENAME(" + document.FORM10.TRADENAME.value + ")";
+				       }
+	if(document.FORM10.VOLUME.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "VOLUME(" + document.FORM10.VOLUME.value + ")";
+				       }
+	if(document.FORM10.WEBSITE.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "WEBSITE(" + document.FORM10.WEBSITE.value + ")";
+				       }
+	if(document.FORM9.SRCTYPE.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "SRCTYPE(" + document.FORM9.SRCTYPE.value + ")";
+				       }
+	if(document.FORM9.SUBJAREA.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "SUBJAREA(" + document.FORM9.SUBJAREA.value + ")";
+				       }
+	if(document.FORM9.TITLE.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "TITLE(" + document.FORM9.TITLE.value + ")";
+				       }
+	if(document.FORM9.TITLEABSKEY.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "TITLE-ABS-KEY(" + document.FORM9.TITLEABSKEY.value + ")";
+				       }
+	if(document.FORM9.TITLEABSKEYAUTH.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "TITLE-ABS-KEY-AUTH(" + document.FORM9.TITLEABSKEYAUTH.value + ")";
+				       }
+	if(document.FORM8.PUBDATETXT.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "PUBDATETXT(" + document.FORM8.PUBDATETXT.value + ")";
+				       }
+	if(document.FORM8.PUBYEAR.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "PUBYEAR(" + document.FORM8.PUBYEAR.value + ")";
+				       }
+	if(document.FORM8.REF.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "REF(" + document.FORM8.REF.value + ")";
+				       }
+	if(document.FORM8.SEQBANK.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "SEQBANK(" + document.FORM8.SEQBANK.value + ")";
+				       }
+	if(document.FORM8.SEQNUMBER.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "SEQNUMBER(" + document.FORM8.SEQNUMBER.value + ")";
+				       }
+	if(document.FORM8.SRCTITLE.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "SRCTITLE(" + document.FORM8.SRCTITLE.value + ")";
+				       }
+	if(document.FORM7.LANGUAGE.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "LANGUAGE(" + document.FORM7.LANGUAGE.value + ")";
+				       }
+	if(document.FORM7.MANUFACTURER.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "MANUFACTURER(" + document.FORM7.MANUFACTURER.value + ")";
+				       }
+	if(document.FORM6.PAGEFIRST.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "PAGEFIRST(" + document.FORM6.PAGEFIRST.value + ")";
+				       }
+	if(document.FORM7.PAGELAST.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "PAGELAST(" + document.FORM7.PAGELAST.value + ")";
+				       }
+	if(document.FORM7.PAGES.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "PAGES(" + document.FORM7.PAGES.value + ")";
+				       }
+	if(document.FORM7.PMID.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "PMID(" + document.FORM7.PMID.value + ")";
+				       }
+	if(document.FORM3.AUTHCOLLAB.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "AUTHCOLLAB(" + document.FORM3.AUTHCOLLAB.value + ")";
+				       }
+				      
+				       if(document.FORM3.AUTHKEY.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "AUTHKEY(" + document.FORM3.AUTHKEY.value + ")";
+				       }
+				       
+				       if(document.FORM3.CASREGNUMBER.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "CASREGNUMBER(" + document.FORM3.CASREGNUMBER.value + ")";
+				       }
+				       
+				       if(document.FORM3.CHEM.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "CHEM(" + document.FORM3.CHEM.value + ")";
+				       }
+				       
+				       if(document.FORM3.CHEMNAME.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "CHEMNAME(" + document.FORM3.CHEMNAME.value + ")";
+				       }
+				       
+				       if(document.FORM3.CODEN.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "CODEN(" + document.FORM3.CODEN.value + ")";
+				       }
+				       
+				       if(document.FORM4.CONF.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "CONF(" + document.FORM4.CONF.value + ")";
+				       }
+				       
+				       if(document.FORM4.CONFLOC.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "CONFLOC(" + document.FORM4.CONFLOC.value + ")";
+				       }
+				       
+				       if(document.FORM4.CONFNAME.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "CONFNAME(" + document.FORM4.CONFNAME.value + ")";
+				       }
+				       
+				       if(document.FORM4.CONFSPONSORS.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "CONFSPONSORS(" + document.FORM4.CONFSPONSORS.value + ")";
+				       }
+				       
+				       if(document.FORM4.DOCTYPE.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "DOCTYPE(" + document.FORM4.DOCTYPE.value + ")";
+				       }
+				       
+				       if(document.FORM4.DOI.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "DOI(" + document.FORM4.DOI.value + ")";
+				       }
+				       
+				       if(document.FORM5.EDFIRST.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "EDFIRST(" + document.FORM5.EDFIRST.value + ")";
+				       }
+				       
+				       if(document.FORM5.EDITOR.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "EDITOR(" + document.FORM5.EDITOR.value + ")";
+				       }
+				       
+				       if(document.FORM5.EDLASTNAME.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "EDLASTNAME(" + document.FORM5.EDLASTNAME.value + ")";
+				       }
+				       
+				       if(document.FORM5.EISSN.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "EISSN(" + document.FORM5.EISSN.value + ")";
+				       }
+				       
+				       if(document.FORM5.EXACTSRCTITLE.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "EXACTSRCTITLE(" + document.FORM5.EXACTSRCTITLE.value + ")";
+				       }
+				       
+				       if(document.FORM5.FIRSTAUTH.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "FIRSTAUTH(" + document.FORM5.FIRSTAUTH.value + ")";
+				       }
+				       
+				       if(document.FORM6.INDEXTERMS.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "INDEXTERMS(" + document.FORM6.INDEXTERMS.value + ")";
+				       }
+				       
+				       if(document.FORM6.ISBN.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "ISBN(" + document.FORM6.ISBN.value + ")";
+				       }
+				       
+				       if(document.FORM6.ISSN.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "ISSN(" + document.FORM6.ISSN.value + ")";
+				       }
+				       
+				       if(document.FORM7.ISSNP.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "ISSNP(" + document.FORM7.ISSNP.value + ")";
+				       }
+				       
+				       if(document.FORM6.ISSUE.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "ISSUE(" + document.FORM6.ISSUE.value + ")";
+				       }
+				       
+				       if(document.FORM6.KEY.value != ""){
+				      		if(str != "") {str += " AND ";}
+				       str += "KEY(" + document.FORM6.KEY.value + ")";
+				       }
+
+		                       varSearchObj.setSearch(str);
+		                       sciverse.search(varSearchObj);
+				}
+				
+				var i = 1960;
+				var k = 0;
+				var months = new Array();
+				months[0] = "January ";
+				months[1] = "February ";
+				months[2] = "March ";
+				months[3] = "April ";
+				months[4] = "May ";
+				months[5] = "June ";
+				months[6] = "July ";
+				months[7] = "August ";
+				months[8] = "September ";
+				months[9] = "October ";
+				months[10] = "November ";
+				months[11] = "December ";
+				
+				function store(){	
+						runSearch(i, months[k]);
+						k++;
+						if(k == 12)
+						{
+							k=0;
+							i++;
+						}
+						if(i == 2015){
+							clearInterval(intervalID);
+						}
+				}
+				
+				function mainFunction(){
+					var aaa = localStorage.getItem("results");
+					//alert("aaa:" + aaa);
+					 var sss = JSON.parse(aaa);
+					 alert(sss.length);
+				}
+				
+				function clearStorage(){
+					localStorage.clear();
+					i = 1960;
+					k = 0;
+				}
+
+				function sleep(milliseconds) {
+  					var start = new Date().getTime();
+  					
+  					for (var i = 0; i < 1e7; i++) {
+    						if ((new Date().getTime() - start) > milliseconds){
+      							break;
+    						}
+  					}
+				}
+				
+				function listAllProperties(o){     
+					var objectToInspect;     
+					var result = [];
+	
+					for(objectToInspect = o; objectToInspect !== null; objectToInspect = Object.getPrototypeOf(objectToInspect)){  
+						result = result.concat(Object.getOwnPropertyNames(objectToInspect));  
+					}
+	
+					alert(result); 
+				}
+				
+				var intervalID;
+			function interval()
+				{
+					intervalID = setInterval(store,3500);
+				}
+				
+			function clearinterval(){
+				clearInterval(intervalID);
+			}
+                        </script>
+                <!-- SECTION 4 : Setting defaults -->
+                        <script type="text/javascript">
+			sciverse.setApiKey("047ce38a42938f4d69e90be16d32e8b5");
+			sciverse.setCallback(callback);
+                        </script>
+     </head>
+<!-- SECTION 5 : Rendering page -->
+     <body>
+
+         <h2>Document Search:</h2>
+                  </form>
+<form name="Form" onsubmit="return false">
+                      <strong>All Fields:</strong><input type="text" name="searchString"/>
+                  </form>
+                  <form name="FORM1" onsubmit="return false">
+                      <table width="80%" style="background-color:white" border="1" cellpadding="2" cellspacing="0">
+                      <tr><td>Abstract:</td><td><input type="text" name="ABS"/></td>
+                      <td>Affiliation:</td><td><input type="text" name="AFFIL"/></td>
+		      		  <td>Affiliation ID:</td><td><input type="text" name="AFID"/></td></tr>
+                      <tr><td>Affiliation City:</td><td><input type="text" name="AFFILCITY"/></td>
+                      <td>Affiliation Country:</td><td><input type="text" name="AFFILCOUNTRY"/></td>
+                      <td>Affiliation Organization:</td><td><input type="text" name="AFFILORG"/></td></tr>
+                      </table>
+                  </form>
+               	  <form name="FORM2" onsubmit="return false">
+               	      <table width="80%" style="background-color:white" border="1" cellpadding="2" cellspacing="0">
+					  <tr><td>Article Number:</td><td><input type="text" name="ARTNUM"/></td>
+               	      <td>Author Identifier Number:</td><td><input type="text" name="AUID"/></td> 
+               	      <td>Author Name:</td><td><input type="text" name="AUTHORNAME"/></td></tr> 
+               	      <tr><td>Author Search Field:</td><td><input type="text" name="AUTH"/></td>
+               	      <td>Author First Initial:</td><td><input type="text" name="AUTHFIRST"/></td>
+               	      <td>Author Last Name (Family Name):</td><td><input type="text" name="AUTHLASTNAME"/></td></tr>
+					  </table>
+               	  </form>
+                  <form name="FORM3" onsubmit="return false">
+					  <table width="80%" style="background-color:white" border="1" cellpadding="2" cellspacing="0">
+               	      <tr><td>Author Keywords:</td><td><input type="text" name="AUTHKEY"/></td>
+               	      <td>CAS Registry Number:</td><td><input type="text" name="CASREGNUMBER"/></td> 
+               	      <td>Chemical:</td><td><input type="text" name="CHEM"/></td></tr>
+               	      <tr><td>Chemical Name:</td><td><input type="text" name="CHEMNAME"/></td> 
+               	      <td>CODEN:</td><td><input type="text" name="CODEN"/></td> 
+		      	 	  <td>Collaboration Author:</td><td><input type="text" name="AUTHCOLLAB"/></td></tr>
+					  </table>
+               	  </form>
+                  <form name="FORM4" onsubmit="return false">
+					  <table width="80%" style="background-color:white" border="1" cellpadding="2" cellspacing="0">
+               	      <tr><td>Conference Information:</td><td><input type="text" name="CONF"/></td>
+               	      <td>Conference Location:</td><td><input type="text" name="CONFLOC"/></td> 
+               	      <td>Conference Name:</td><td><input type="text" name="CONFNAME"/></td></tr>
+               	      <tr><td>Conference Sponsors:</td><td><input type="text" name="CONFSPONSORS"/></td>
+               	      <td>Digital Object Identifier (DOI):</td><td><input type="text" name="DOI"/></td>
+		      		  <td>DOCTYPE (XX):</td><td><input type="text" name="DOCTYPE"/></td></tr>
+					  </table>
+               	  </form>
+                 <form name="FORM5" onsubmit="return false">
+					  <table width="80%" style="background-color:white" border="1" cellpadding="2" cellspacing="0">
+               	      <tr><td>Editor First Name (Given Name):</td><td><input type="text" name="EDFIRST"/></td>
+               	      <td>Editor:</td><td><input type="text" name="EDITOR"/></td> 
+               	      <td>Editor Last Name (Family Name):</td><td><input type="text" name="EDLASTNAME"/></td></tr> 
+               	      <tr><td>Electronic International Standard Serial Number:</td><td><input type="text" name="EISSN"/></td> 
+               	      <td>Exact Source Title:</td><td><input type="text" name="EXACTSRCTITLE"/></td>
+               	      <td>First Author:</td><td><input type="text" name="FIRSTAUTH"/></td></tr> 
+					  </table>
+               	  </form>
+                  <form name="FORM6" onsubmit="return false">
+					  <table width="80%" style="background-color:white" border="1" cellpadding="2" cellspacing="0">
+               	      <tr><td>First page:</td><td><input type="text" name="PAGEFIRST"/></td>
+		      		  <td>Index Terms:</td><td><input type="text" name="INDEXTERMS"/></td>
+               	      <td>International Standard Book Number:</td><td><input type="text" name="ISBN"/></td></tr>   
+               	      <tr><td>International Standard Serial Number:</td><td><input type="text" name="ISSN"/></td>
+               	      <td>Issues:</td><td><input type="text" name="ISSUE"/></td> 
+               	      <td>Keywords:</td><td><input type="text" name="KEY"/></td></tr> 
+					  </table> 
+               	  </form>
+                  <form name="FORM7" onsubmit="return false">
+					  <table width="80%" style="background-color:white" border="1" cellpadding="2" cellspacing="0">
+               	      <tr><td>Language:</td><td><input type="text" name="LANGUAGE"/></td>
+               	      <td>Last page:</td><td><input type="text" name="PAGELAST"/></td>
+		      		  <td>Manufacturer:</td><td><input type="text" name="MANUFACTURER"/></td></tr>   
+               	      <tr><td>Pages:</td><td><input type="text" name="PAGES"/></td>
+		      		  <td>Print International Standard Serial Number:</td><td><input type="text" name="ISSNP"/></td> 
+               	      <td>PubMed Identifier:</td><td><input type="text" name="PMID"/></td></tr> 
+					  </table>
+               	  </form>
+                 <form name="FORM8" onsubmit="return false">
+					  <table width="80%" style="background-color:white" border="1" cellpadding="2" cellspacing="0">
+               	      <tr><td>Date of Publication:</td><td><input type="text" name="PUBDATETXT"/></td>
+               	      <td>Year of Publication:</td><td><input type="text" name="PUBYEAR"/></td> 
+               	      <td>References:</td><td><input type="text" name="REF"/></td></tr> 
+               	      <tr><td>Sequence Bank:</td><td><input type="text" name="SEQBANK"/></td> 
+               	      <td>Sequence Bank Accession Number:</td><td><input type="text" name="SEQNUMBER"/></td>
+               	      <td>Source Title:</td><td><input type="text" name="SRCTITLE"/></td></tr>
+   					  </table> 
+               	  </form>
+                  <form name="FORM9" onsubmit="return false">
+					  <table width="80%" style="background-color:white" border="1" cellpadding="2" cellspacing="0">
+               	      <tr><td>SRCTYPE(XX):</td><td><input type="text" name="SRCTYPE"/></td>
+               	      <td>Subject Area:</td><td><input type="text" name="SUBJAREA"/></td>  
+               	      <td>Article Title:</td><td><input type="text" name="TITLE"/></td></tr> 
+               	      <tr><td>Compound Field(Abstract, Article Title, Keyword, Author):</td><td><input type="text" name="TITLEABSKEY"/></td>
+               	      <td>Compound Field(Abstract, Article Title, Keyword):</td><td><input type="text" name="TITLEABSKEYAUTH"/></td></tr> 
+					  </table>
+               	  </form>
+                  <form name="FORM10" onsubmit="return false">
+					  <table width="80%" style="background-color:white" border="1" cellpadding="2" cellspacing="0">
+               	      <tr><td>Trade Name:</td><td><input type="text" name="TRADENAME"/></td>
+               	      <td>Volume:</td><td><input type="text" name="VOLUME"/></td> 
+               	      <td>Website:</td><td><input type="text" name="WEBSITE"/></td></tr>
+					  </table>
+               	  </form>
+<form name="sciverseForm" onsubmit="return false">
+                      <button onClick="store()" target = "#" name="searchButton"/>SEARCH</button>
+                  </form>
+		      <button onClick="clearStorage()" target = "#" name="clear"/>CLEAR STORAGE</button>
+		      <button onClick="mainFunction()" target = "#" name="main"/>NUMBER OF RESULTS</button>
+		      <button onClick="interval()" target = "#" name="theButton"/>START</button>
+		      <button onClick="clearinterval()" target = "#" name="qwerty"/>STOP</button>
+		      
+	                  
+         <h2>Returned sciverse Content:</h2>
+                  <div id="sciverse">
+                      None.
+                  </div>
+     </body>
+</html>
